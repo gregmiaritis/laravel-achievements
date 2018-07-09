@@ -23,6 +23,7 @@ abstract class Achievement
      */
     public $name = "Achievement";
 
+    public $imgs = "";
     /*
      * A small description for the achievement
      */
@@ -34,7 +35,7 @@ abstract class Achievement
     public $points = 1;
 
     /*
-     * Whether this is a secret achievement or not.
+     * Whether this is a secret achievment or not.
      */
     public $secret = false;
 
@@ -45,14 +46,6 @@ abstract class Achievement
     public function __construct()
     {
         $this->getModel();
-    }
-
-    /**
-     * Wrapper for AchievementDetail::all();
-     * Conveniently fetches all achievements stored in the database.
-     */
-    public static function all(){
-        return AchievementDetails::all();
     }
 
     /**
@@ -92,6 +85,7 @@ abstract class Achievement
         $model->name        = $this->name;
         $model->description = $this->description;
         $model->points      = $this->points;
+        $model->imgs        = $this->imgs;
         $model->secret      = $this->secret;
 
         // Saves
@@ -133,14 +127,13 @@ abstract class Achievement
 
     /**
      * Gets the achiever's progress data for this achievement, or creates a new one if not existant
-     * @param \Illuminate\Database\Eloquent\Model $achiever
+     * @param mixed|null $achiever
      *
      * @return AchievementProgress
      */
     public function getOrCreateProgressForAchiever($achiever)
     {
-        $className = $this->getAchieverClassName($achiever);
-
+        $className = get_class($achiever);
         $achievementId = $this->getModel()->id;
         $progress = AchievementProgress::where('achiever_type', $className)
                                        ->where('achievement_id', $achievementId)
@@ -156,21 +149,6 @@ abstract class Achievement
         }
 
         return $progress;
-    }
-
-    /**
-     * Gets model morph name
-     *
-     * @param \Illuminate\Database\Eloquent\Model $achiever
-     * @return string
-     */
-    protected function getAchieverClassName($achiever)
-    {
-        if ($achiever instanceof \Illuminate\Database\Eloquent\Model) {
-            return $achiever->getMorphClass();
-        }
-
-        return get_class($achiever);
     }
 
     /**
